@@ -2,8 +2,8 @@
 //  main.swift
 //  SimpleDomainModel
 //
-//  Created by Ted Neward on 4/6/16.
-//  Copyright © 2016 Ted Neward. All rights reserved.
+//  Created by Ethan McGregor on 4/10/17.
+//  Copyright © 2016 Ethan McGregor. All rights reserved.
 //
 
 import Foundation
@@ -20,6 +20,7 @@ open class TestMe {
   }
 }
 
+
 ////////////////////////////////////
 // Money
 //
@@ -29,7 +30,10 @@ public struct Money {
     
     public func convert(_ newCur: String) -> Money {
         var newAmount : Double = 0
-        let error : String = "sorry, only converting to USD, GBP, EUR, and CAN is available at this time."
+        let error : String = "Sorry, only converting to USD, GBP, EUR, and CAN is available at this time."
+        if(currency == newCur){
+            newAmount = amount
+        }
         switch currency {
         case "USD":
             switch newCur {
@@ -39,15 +43,11 @@ public struct Money {
                 newAmount = amount * 1.5
             case "CAN":
                 newAmount = amount * 1.25
-            case "USD":
-                newAmount = amount
             default:
                 print(error)
             }
         case "GBP":
             switch newCur {
-            case "GBP":
-                newAmount = amount
             case "EUR":
                 newAmount = amount * 1.5
             case "CAN":
@@ -61,8 +61,6 @@ public struct Money {
             switch newCur {
             case "GBP":
                 newAmount = amount / 3
-            case "EUR":
-                newAmount = amount
             case "CAN":
                 newAmount = amount / 6 * 5
             case "USD":
@@ -76,8 +74,6 @@ public struct Money {
                 newAmount = amount * 0.8
             case "EUR":
                 newAmount = amount / 5 * 6
-            case "CAN":
-                newAmount = amount
             case "USD":
                 newAmount = amount / 1.25
             default:
@@ -93,24 +89,26 @@ public struct Money {
     }
     
     public func add(_ oldMoney: Money) -> Money {
-        let money = self.convert(oldMoney.currency)
-        let newAmount = money.amount + oldMoney.amount
-        let newCurrency = oldMoney.currency
-        let newMoney =  Money(amount: newAmount, currency: newCurrency)
-        return newMoney
+        if (self.currency == oldMoney.currency) {
+            return Money(amount: self.amount + oldMoney.amount, currency: self.currency)
+        } else {
+            return oldMoney.add(self.convert(oldMoney.currency))
+        }
     }
     
     
     public func subtract(_ oldMoney: Money) -> Money {
-        let money = self.convert(oldMoney.currency)
-        let newAmount = money.amount - oldMoney.amount
-        let newCurrency = oldMoney.currency
-        let newMoney =  Money(amount: newAmount, currency: newCurrency)
-        return newMoney
+        if (self.currency == oldMoney.currency) {
+            return Money(amount: self.amount - oldMoney.amount, currency: self.currency)
+        } else {
+            return oldMoney.subtract(self.convert(oldMoney.currency))
+        }
     }
 }
 
-
+////////////////////////////////////
+// Job
+//
 open class Job {
     fileprivate var title : String
     fileprivate var type : JobType
@@ -132,16 +130,18 @@ open class Job {
         }
     }
     
-    // bumps up the salary by the passed amount for the specific job type
     open func raise(_ amt : Double) {
         switch type {
         case .Hourly(let income) : type = JobType.Hourly(income + amt)
-        case .Salary(let income) : type = JobType.Salary(Int(Double(income) + amt)) // should this be saved in var type?
+        case .Salary(let income) : type = JobType.Salary(Int(Double(income) + amt))
         }
     }
 }
 
 
+////////////////////////////////////
+// Person
+//
 open class Person {
     open var firstName : String = ""
     open var lastName : String = ""
@@ -149,11 +149,11 @@ open class Person {
     
     fileprivate var _job : Job? = nil
     
-    // getters and setters for Job class
+   
     open var job : Job? {
         get { return _job}
         set(value) {
-            if (self.age > 15) {
+            if (self.age >= 16) {
                 _job = value
             }
         }
@@ -163,7 +163,7 @@ open class Person {
     open var spouse : Person? {
         get { return _spouse }
         set(value) {
-            if (self.age > 17) {
+            if (self.age >= 18) {
                 _spouse =  value
             }
         }
@@ -182,20 +182,29 @@ open class Person {
 }
 
 
+////////////////////////////////////
+// Family
+//
 open class Family {
     fileprivate var members : [Person] = []
     
     public init(spouse1: Person, spouse2: Person) {
-        members.append(spouse1) //add couple to famile array
+        members.append(spouse1)
         members.append(spouse2)
-        spouse1.spouse = spouse2 //assign spouse to each other
+        spouse1.spouse = spouse2
         spouse2.spouse = spouse1
     }
     
     open func haveChild(_ child: Person) -> Bool {
-        child.age = 0
-        members.append(child)
-        return true
+        
+        for i in members {
+            
+                        if (i.age > 21) {
+                members.append(child)
+                return true
+            }
+        }
+        return false
     }
     
     open func householdIncome() -> Int {
@@ -204,8 +213,7 @@ open class Family {
         
         for i in members {
             
-            if (i.age > 16 && i._job != nil) {
-                // 40 hrs / week * 52 weeks = 2080 hrs per year
+            if (i.age >= 16 && i._job != nil) {
                 totalIncome += (i._job?.calculateIncome(2000))!
             }
         }
