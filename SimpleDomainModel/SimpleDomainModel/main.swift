@@ -33,57 +33,58 @@ public struct Money {
         let error : String = "Sorry, only converting to USD, GBP, EUR, and CAN is available at this time."
         if(currency == newCur){
             newAmount = amount
-        }
-        switch currency {
-        case "USD":
-            switch newCur {
-            case "GBP":
-                newAmount = amount * 0.5
-            case "EUR":
-                newAmount = amount * 1.5
-            case "CAN":
-                newAmount = amount * 1.25
-            default:
-                print(error)
-            }
-        case "GBP":
-            switch newCur {
-            case "EUR":
-                newAmount = amount * 1.5
-            case "CAN":
-                newAmount = amount * 2.5
-            case "USD":
-                newAmount = amount * 2
-            default:
-                print(error)
-            }
-        case "EUR":
-            switch newCur {
-            case "GBP":
-                newAmount = amount / 3
-            case "CAN":
-                newAmount = amount / 6 * 5
-            case "USD":
-                newAmount = amount / 1.5
-            default:
-                print(error)
-            }
-        case "CAN":
-            switch newCur {
-            case "GBP":
-                newAmount = amount * 0.8
-            case "EUR":
-                newAmount = amount / 5 * 6
-            case "USD":
-                newAmount = amount / 1.25
-            default:
-                print(error)
-            }
+        }else{
             
-        default:
-            print(error)
+            switch currency {
+            case "USD":
+                switch newCur {
+                case "GBP":
+                    newAmount = amount * 0.5
+                case "EUR":
+                    newAmount = amount * 1.5
+                case "CAN":
+                    newAmount = amount * 1.25
+                default:
+                    print(error)
+                }
+            case "GBP":
+                switch newCur {
+                case "EUR":
+                    newAmount = amount * 1.5
+                case "CAN":
+                    newAmount = amount * 2.5
+                case "USD":
+                    newAmount = amount * 2
+                default:
+                    print(error)
+                }
+            case "EUR":
+                switch newCur {
+                case "GBP":
+                    newAmount = amount / 3
+                case "CAN":
+                    newAmount = amount / 6 * 5
+                case "USD":
+                    newAmount = amount / 1.5
+                default:
+                    print(error)
+                }
+            case "CAN":
+                switch newCur {
+                case "GBP":
+                    newAmount = amount * 0.8
+                case "EUR":
+                    newAmount = amount / 5 * 6
+                case "USD":
+                    newAmount = amount / 1.25
+                default:
+                    print(error)
+                }
+                
+            default:
+                print(error)
+            }
         }
-        
         let newMoney = Money(amount: newAmount, currency: newCur)
         return newMoney
     }
@@ -130,10 +131,10 @@ open class Job {
         }
     }
     
-    open func raise(_ amt : Double) {
+    open func raise(_ amount : Double) {
         switch type {
-        case .Hourly(let income) : type = JobType.Hourly(income + amt)
-        case .Salary(let income) : type = JobType.Salary(Int(Double(income) + amt))
+        case .Hourly(let income) : type = JobType.Hourly(income + amount)
+        case .Salary(let income) : type = JobType.Salary(Int(Double(income) + amount))
         }
     }
 }
